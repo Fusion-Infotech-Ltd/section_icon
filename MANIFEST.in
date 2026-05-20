@@ -1,0 +1,18 @@
+include MANIFEST.in
+include requirements.txt
+include *.json
+include *.md
+include *.py
+include *.txt
+recursive-include section_icon *.css
+recursive-include section_icon *.csv
+recursive-include section_icon *.html
+recursive-include section_icon *.ico
+recursive-include section_icon *.js
+recursive-include section_icon *.json
+recursive-include section_icon *.md
+recursive-include section_icon *.png
+recursive-include section_icon *.py
+recursive-include section_icon *.svg
+recursive-include section_icon *.txt
+recursive-exclude section_icon *.pyc

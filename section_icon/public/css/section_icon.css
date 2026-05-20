@@ -1,0 +1,22 @@
+/* Make the section head a flex row so children align naturally */
+.section-head {
+    display: flex;
+    align-items: center;
+}
+
+.section-head .section-icon-svg {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 2em;
+    height: 2em;
+    margin-right: 0.4em;
+    flex-shrink: 0;       
+    color: inherit;
+}
+
+.section-head .section-icon-svg svg {
+    width: 100%;
+    height: 100%;
+    display: block;
+}
