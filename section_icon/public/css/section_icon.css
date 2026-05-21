@@ -1,4 +1,4 @@
-/* Make the section head a flex row so children align naturally */
+/* Author: Raisul Islam (raisul.aust1@gmail.com */
 .section-head {
     display: flex;
     align-items: center;
@@ -8,8 +8,8 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 2em;
-    height: 2em;
+    width: 1.5em;
+    height: 1.5em;
     margin-right: 0.4em;
     flex-shrink: 0;       
     color: inherit;
