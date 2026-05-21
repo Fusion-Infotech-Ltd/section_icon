@@ -22,11 +22,11 @@
    "reqd": 1
   },
   {
-   "description": "The fieldname of the Section Break in the target DocType (e.g. <code>section_break_3</code>).",
+   "description": "Select a Section Break from the target DocType. Choose DocType first.",
    "fieldname": "fieldname",
-   "fieldtype": "Data",
+   "fieldtype": "Autocomplete",
    "in_list_view": 1,
-   "label": "Section Break Fieldname",
+   "label": "Section Break",
    "reqd": 1
   },
     {
