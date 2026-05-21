@@ -4,6 +4,13 @@ A Frappe app that adds SVG icons to Section Break fields in your forms
 
 Icons are stored in a dedicated **Section Icon** doctype and rendered inline next to section titles at runtime via a lightweight client script.
 
+# Images
+
+**Light Theme**
+<img width="480" height="270" alt="image" src="https://github.com/user-attachments/assets/003a8a98-bd59-44ea-97ba-460ed8bf9b7b" />
+
+**Dark Theme**
+<img width="480" height="270" alt="image" src="https://github.com/user-attachments/assets/092af0c3-24aa-4556-8230-ef83fe716404" />
 
 ---
 
