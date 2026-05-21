@@ -18,3 +18,26 @@ def get_icons_for(doctype: str) -> list[dict]:
 		filters={"for_doctype": doctype},
 		fields=["fieldname", "svg_markup"],
 	)
+
+
+@frappe.whitelist()
+def get_section_breaks_for(doctype: str) -> list[dict]:
+	"""Return Section Break fields for a DocType as {fieldname, label} for the form dropdown."""
+	if not doctype:
+		return []
+
+	if frappe.session.user == "Guest":
+		frappe.throw(frappe._("Not permitted"), frappe.PermissionError)
+
+	if not frappe.db.exists("DocType", doctype):
+		return []
+
+	meta = frappe.get_meta(doctype)
+	return [
+		{
+			"fieldname": df.fieldname,
+			"label": (df.label or df.fieldname).strip(),
+		}
+		for df in meta.fields
+		if df.fieldtype == "Section Break" and df.fieldname
+	]
