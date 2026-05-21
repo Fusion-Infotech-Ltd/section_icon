@@ -53,7 +53,7 @@ Go to **Section Icon List → New** and fill in:
 | Field | Description |
 |---|---|
 | **DocType** | The target DocType (e.g. `Employee`) |
-| **Section Break Fieldname** | The exact fieldname of the Section Break (e.g. `passport_details_section`) |
+| **Section Break Fieldname** | Select the section break fieldname (e.g. `passport_details_section`) |
 | **SVG File** | Upload an `.svg` file — markup is extracted automatically |
 | **SVG Markup** | Or paste raw SVG markup directly |
 
