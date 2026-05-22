@@ -17,8 +17,9 @@ Icons are stored in a dedicated **Section Icon** doctype and rendered inline nex
 ## How it works
 
 1. You create a **Section Icon** record linking a DocType, a Section Break fieldname, and an SVG icon.
-2. A bundled JS script listens for `form-refresh` events, fetches the icons for the current DocType (cached per session), and prepends each SVG inline next to the matching section title.
-3. Cache is invalidated automatically via a Frappe realtime event whenever an icon is saved or deleted.
+2. Uncheck Use same icon in dark mode to upload separate icon for dark and light theme. (optional)
+3. A bundled JS script listens for `form-refresh` events, fetches the icons for the current DocType (cached per session), and prepends each SVG inline next to the matching section title.
+4. Cache is invalidated automatically via a Frappe realtime event whenever an icon is saved or deleted.
 
 No Custom Fields are added to any DocType. No monkey-patching of core forms.
 
@@ -54,7 +55,7 @@ Go to **Section Icon List → New** and fill in:
 |---|---|
 | **DocType** | The target DocType (e.g. `Employee`) |
 | **Section Break Fieldname** | Select the section break fieldname (e.g. `passport_details_section`) |
-| **SVG File** | Upload an `.svg` file — markup is extracted automatically |
+| **SVG File** | Upload an `.svg` file — markup is extracted automatically. Uncheck Use same icon in dark mode for separate icons for each theme |
 | **SVG Markup** | Or paste raw SVG markup directly |
 
 Either **SVG File** or **SVG Markup** must be provided. If you upload a file, the markup field is populated automatically on save.
