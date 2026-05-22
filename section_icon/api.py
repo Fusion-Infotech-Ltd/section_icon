@@ -3,7 +3,7 @@ import frappe
 
 @frappe.whitelist()
 def get_icons_for(doctype: str) -> list[dict]:
-	"""Return list of {fieldname, svg_markup} for the given DocType.
+	"""Return list of {fieldname, svg_markup, dark_svg_markup} for the given DocType.
 
 	Available to any authenticated user; required to render section icons on forms.
 	"""
@@ -16,7 +16,7 @@ def get_icons_for(doctype: str) -> list[dict]:
 	return frappe.get_all(
 		"Section Icon",
 		filters={"for_doctype": doctype},
-		fields=["fieldname", "svg_markup"],
+		fields=["fieldname", "svg_markup", "dark_svg_markup"],
 	)
 
 

@@ -8,8 +8,13 @@
  "field_order": [
   "for_doctype",
   "fieldname",
+  "use_same_icon_in_dark_mode",
+  "icons_section",
   "svg_file",
-  "svg_markup"
+  "svg_markup",
+  "column_break_pgee",
+  "dark_svg_file",
+  "dark_svg_markup"
  ],
  "fields": [
   {
@@ -29,27 +34,60 @@
    "label": "Section Break",
    "reqd": 1
   },
-    {
-    "fieldname": "svg_file",
-    "fieldtype": "Attach",
-    "label": "SVG File",
-    "description": "Upload an .svg file — markup will be extracted automatically."
-    },
+  {
+   "description": "Upload an .svg file \u2014 markup will be extracted automatically.",
+   "fieldname": "svg_file",
+   "fieldtype": "Attach",
+   "label": "SVG File",
+   "mandatory_depends_on": "eval: doc.use_same_icon_in_dark_mode == 0"
+  },
   {
    "description": "Paste raw SVG markup.",
    "fieldname": "svg_markup",
    "fieldtype": "Code",
    "label": "SVG Markup",
-   "options": "HTML",
-   "reqd": 0
+   "options": "HTML"
+  },
+  {
+   "default": "1",
+   "description": "System may automatically adjust icon colors to match the theme.",
+   "fieldname": "use_same_icon_in_dark_mode",
+   "fieldtype": "Check",
+   "label": "Use same icon in dark mode",
+   "show_description_on_click": 1
+  },
+  {
+   "fieldname": "icons_section",
+   "fieldtype": "Section Break",
+   "label": "Icons"
+  },
+  {
+   "fieldname": "column_break_pgee",
+   "fieldtype": "Column Break"
+  },
+  {
+   "depends_on": "eval: doc.use_same_icon_in_dark_mode == 0",
+   "description": "Upload an .svg file \u2014 markup will be extracted automatically.",
+   "fieldname": "dark_svg_file",
+   "fieldtype": "Attach",
+   "label": "Dark SVG File",
+   "mandatory_depends_on": "eval: doc.use_same_icon_in_dark_mode == 0"
+  },
+  {
+   "depends_on": "eval: doc.use_same_icon_in_dark_mode == 0",
+   "description": "Paste raw SVG markup.",
+   "fieldname": "dark_svg_markup",
+   "fieldtype": "Code",
+   "label": "Dark SVG Markup",
+   "options": "HTML"
   }
  ],
- "index_web_pages_for_search": 0,
  "links": [],
- "modified": "2025-05-20 00:00:00",
+ "modified": "2026-05-23 01:57:42.743367",
  "modified_by": "Administrator",
  "module": "Section Icon",
  "name": "Section Icon",
+ "naming_rule": "Expression (old style)",
  "owner": "Administrator",
  "permissions": [
   {
@@ -65,6 +103,7 @@
    "write": 1
   }
  ],
+ "row_format": "Dynamic",
  "sort_field": "modified",
  "sort_order": "DESC",
  "states": [],

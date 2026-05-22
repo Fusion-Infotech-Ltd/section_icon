@@ -2,11 +2,15 @@
 
 // Render inline SVG icons next to Section Break titles.
 //
-// Icons are stored as `Section Icon` documents (for_doctype, fieldname, svg_markup)
-// and fetched via section_icon.api.get_icons_for(doctype). Results are cached per
-// session and invalidated via the `section_icon_updated` realtime event.
+// Icons are stored as `Section Icon` documents (for_doctype, fieldname,
+// svg_markup, dark_svg_markup) and fetched via section_icon.api.get_icons_for(doctype).
+// Results are cached per session and invalidated via the `section_icon_updated`
+// realtime event.
 //
-// SVG fills/strokes are adapted for light/dark desk themes (black↔white, greys inverted).
+// The light-theme SVG (svg_markup) is rendered as-is for the light desk theme,
+// and the dark-theme SVG (dark_svg_markup) is rendered as-is for the dark desk theme.
+// If dark_svg_markup is empty, svg_markup is colour-adapted (black↔white,
+// greys inverted) as a fallback for dark mode.
 (function () {
 	const cache = {};
 	const pending = {};
@@ -158,13 +162,24 @@
 		return svg.outerHTML;
 	}
 
+	function pick_svg(entry, theme) {
+		if (!entry) return "";
+		const light = entry.svg_markup || "";
+		const dark = entry.dark_svg_markup || "";
+		if (theme === "dark") {
+			if (dark) return dark;
+			return adapt_svg_markup(light, theme);
+		}
+		return light;
+	}
+
 	function apply_theme_to_icons() {
 		const theme = get_theme();
 		$(".section-icon-svg").each(function () {
 			const $el = $(this);
-			const original = $el.data("original-svg");
-			if (!original) return;
-			$el.html(adapt_svg_markup(original, theme));
+			const entry = $el.data("svg-entry");
+			if (!entry) return;
+			$el.html(pick_svg(entry, theme));
 		});
 	}
 
@@ -204,7 +219,10 @@
 			.then(function (rows) {
 				const map = {};
 				(rows || []).forEach(function (r) {
-					if (r && r.fieldname) map[r.fieldname] = r.svg_markup || "";
+					if (r && r.fieldname) map[r.fieldname] = {
+						svg_markup: r.svg_markup || "",
+						dark_svg_markup: r.dark_svg_markup || ""
+					};
 				});
 				cache[doctype] = map;
 				delete pending[doctype];
@@ -222,21 +240,21 @@
 		const theme = get_theme();
 		frm.layout.sections.forEach(function (section) {
 			if (!section || !section.df || !section.head) return;
-			const svg = icons[section.df.fieldname];
-			if (!svg) return;
+			const entry = icons[section.df.fieldname];
+			if (!entry) return;
 
 			const $existing = section.head.find(".section-icon-svg");
 			if ($existing.length) {
-				$existing.data("original-svg", svg);
-				$existing.html(adapt_svg_markup(svg, theme));
+				$existing.data("svg-entry", entry);
+				$existing.html(pick_svg(entry, theme));
 				return;
 			}
 
 			const $icon = $(
 				'<span class="section-icon-svg" aria-hidden="true"></span>'
 			);
-			$icon.data("original-svg", svg);
-			$icon.html(adapt_svg_markup(svg, theme));
+			$icon.data("svg-entry", entry);
+			$icon.html(pick_svg(entry, theme));
 			section.head.prepend($icon);
 		});
 	}

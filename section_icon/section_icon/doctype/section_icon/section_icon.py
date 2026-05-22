@@ -8,12 +8,14 @@ from frappe.model.document import Document
 
 class SectionIcon(Document):
 	def validate(self):
-		if self.fieldname:
-			self.fieldname = self.fieldname.strip()
-
-		if self.svg_file:
+		
+		if not self.use_same_icon_in_dark_mode:
+			self._load_svg_from_file(dark=True)
 			self._load_svg_from_file()
 
+		else: 
+			self._load_svg_from_file()
+		
 		if not self.svg_markup:
 			frappe.throw(
 				frappe._("Provide either an SVG file or paste SVG markup directly.")
@@ -42,13 +44,16 @@ class SectionIcon(Document):
 					)
 				)
 
-	def _load_svg_from_file(self):
+	def _load_svg_from_file(self, dark=False):
 		"""Read the uploaded SVG file and populate svg_markup."""
 		if not self.svg_file.lower().endswith(".svg"):
 			frappe.throw(frappe._("Uploaded file must be an .svg file."))
 
 		try:
-			file_doc = frappe.get_doc("File", {"file_url": self.svg_file})
+			if dark:
+				file_doc = frappe.get_doc("File", {"file_url": self.dark_svg_file})
+			else:
+				file_doc = frappe.get_doc("File", {"file_url": self.svg_file})
 			content = file_doc.get_content()
 		except frappe.DoesNotExistError:
 			frappe.throw(frappe._("Uploaded file record not found. Please re-upload."))
@@ -60,7 +65,10 @@ class SectionIcon(Document):
 		if not match:
 			frappe.throw(frappe._("No <svg> element found in the uploaded file."))
 
-		self.svg_markup = content[match.start():].strip()
+		if dark:
+			self.dark_svg_markup = content[match.start():].strip()
+		else:
+			self.svg_markup = content[match.start():].strip()
 
 	def on_update(self):
 		frappe.publish_realtime(
