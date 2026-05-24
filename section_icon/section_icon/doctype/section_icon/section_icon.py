@@ -8,6 +8,10 @@ from frappe.model.document import Document
 
 class SectionIcon(Document):
 	def validate(self):
+		if not self.svg_file and not self.svg_markup:
+			frappe.throw(
+				frappe._("Provide either an SVG file or paste SVG markup directly.")
+			)
 		
 		if not self.use_same_icon_in_dark_mode:
 			self._load_svg_from_file(dark=True)
@@ -43,20 +47,39 @@ class SectionIcon(Document):
 						frappe.bold(df.fieldtype),
 					)
 				)
+		
+		if self.use_same_icon_in_dark_mode:
+			self.dark_svg_markup = ""
+			self.dark_svg_file = None
+
 
 	def _load_svg_from_file(self, dark=False):
 		"""Read the uploaded SVG file and populate svg_markup."""
-		if not self.svg_file.lower().endswith(".svg"):
-			frappe.throw(frappe._("Uploaded file must be an .svg file."))
+
+		if dark:
+			if not self.dark_svg_file:
+				return
+			if not self.dark_svg_file.lower().endswith(".svg") and "<svg" not in (self.dark_svg_markup or "").lower():
+				frappe.throw(frappe._("Uploaded dark mode file must be an .svg file."))
+		else:
+			if not self.svg_file:
+				return
+			if not self.svg_file.lower().endswith(".svg") and "<svg" not in (self.svg_markup or "").lower():
+				frappe.throw(frappe._("Uploaded file must be an .svg file."))
 
 		try:
-			if dark:
+			content = ""
+			file_doc = ""
+			if dark and self.dark_svg_file:
 				file_doc = frappe.get_doc("File", {"file_url": self.dark_svg_file})
-			else:
+			elif not dark and self.svg_file:
 				file_doc = frappe.get_doc("File", {"file_url": self.svg_file})
-			content = file_doc.get_content()
+			if file_doc:
+				content = file_doc.get_content() if file_doc else ""
+
 		except frappe.DoesNotExistError:
-			frappe.throw(frappe._("Uploaded file record not found. Please re-upload."))
+			content = self.dark_svg_markup if dark else self.svg_markup
+			# frappe.throw(frappe._("Uploaded file record not found. Please re-upload."))
 
 		if isinstance(content, bytes):
 			content = content.decode("utf-8")

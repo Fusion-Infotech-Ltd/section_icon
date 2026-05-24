@@ -38,8 +38,7 @@
    "description": "Upload an .svg file \u2014 markup will be extracted automatically.",
    "fieldname": "svg_file",
    "fieldtype": "Attach",
-   "label": "SVG File",
-   "mandatory_depends_on": "eval: doc.use_same_icon_in_dark_mode == 0"
+   "label": "SVG File"
   },
   {
    "description": "Paste raw SVG markup.",
@@ -70,8 +69,7 @@
    "description": "Upload an .svg file \u2014 markup will be extracted automatically.",
    "fieldname": "dark_svg_file",
    "fieldtype": "Attach",
-   "label": "Dark SVG File",
-   "mandatory_depends_on": "eval: doc.use_same_icon_in_dark_mode == 0"
+   "label": "Dark SVG File"
   },
   {
    "depends_on": "eval: doc.use_same_icon_in_dark_mode == 0",
@@ -83,7 +81,7 @@
   }
  ],
  "links": [],
- "modified": "2026-05-23 01:57:42.743367",
+ "modified": "2026-05-24 10:00:08.856765",
  "modified_by": "Administrator",
  "module": "Section Icon",
  "name": "Section Icon",
