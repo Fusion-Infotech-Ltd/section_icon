@@ -39,14 +39,6 @@ class SectionIcon(Document):
 						frappe.bold(self.fieldname), frappe.bold(self.for_doctype)
 					)
 				)
-			if df.fieldtype != "Section Break":
-				frappe.throw(
-					frappe._("Field {0} on {1} is of type {2}, not Section Break.").format(
-						frappe.bold(self.fieldname),
-						frappe.bold(self.for_doctype),
-						frappe.bold(df.fieldtype),
-					)
-				)
 		
 		if self.use_same_icon_in_dark_mode:
 			self.dark_svg_markup = ""
