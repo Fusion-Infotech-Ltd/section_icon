@@ -10,6 +10,15 @@ frappe.ui.form.on("Section Icon", {
 		if (frm.doc.fieldname) {
 			frm.set_value("fieldname", "");
 		}
+		if (frm.doc.field_type) {
+			frm.set_value("field_type", "");
+		}
+	},
+
+	field_type(frm) {
+		if (frm.doc.fieldname) {
+			frm.set_value("fieldname", "");
+		}
 		refresh_section_break_options(frm);
 	},
 
@@ -19,6 +28,7 @@ frappe.ui.form.on("Section Icon", {
 });
 
 function refresh_section_break_options(frm) {
+	if (!frm.doc.field_type || !frm.doc.for_doctype) return;
 	const control = frm.fields_dict.fieldname;
 
 	if (!frm.doc.for_doctype) {
@@ -43,6 +53,7 @@ function refresh_section_break_options(frm) {
 	frappe
 		.xcall("section_icon.api.get_section_breaks_for", {
 			doctype: frm.doc.for_doctype,
+				ft: frm.doc.field_type,
 		})
 		.then(function (rows) {
 			const options = (rows || []).map(function (row) {

@@ -204,68 +204,91 @@
         return pending[doctype];
     }
 
-    // Native layout rendering engine using Form field dictionaries directly
-    function render(frm, icons) {
-        if (!frm || !frm.fields_dict || !frm.wrapper) return;
-        const theme = get_theme();
-        const $form_wrapper = $(frm.wrapper); // FIXED: Wrap the raw native element with jQuery
+	function render(frm, icons) {
+		if (!frm || !frm.fields_dict || !frm.wrapper) return;
+		const theme = get_theme();
+		const $form_wrapper = $(frm.wrapper);
 
-        Object.keys(icons).forEach(function (fieldname) {
-            const entry = icons[fieldname];
-            if (!entry) return;
+		// Build fieldname → col.wrapper map by walking frm.layout.sections
+		const column_dom_map = {};
+		if (frm.layout && Array.isArray(frm.layout.sections)) {        
+			frm.layout.sections.forEach(function (section) {             
+				if (!section || !Array.isArray(section.columns)) return;
+				section.columns.forEach(function (col) {
+					if (col && col.df && col.df.fieldtype === "Column Break" && col.df.fieldname) {
+						if (col.wrapper && col.wrapper.length) {
+							column_dom_map[col.df.fieldname] = col.wrapper; 
+						}
+					}
+				});
+			});
+		}
 
-            const field = frm.fields_dict[fieldname];
-            if (!field) return;
+		Object.keys(icons).forEach(function (fieldname) {
+			const entry = icons[fieldname];
+			if (!entry) return;
+			if (column_dom_map.hasOwnProperty(fieldname)) {             
+				const $col_wrapper = column_dom_map[fieldname];        
+				const $target = $col_wrapper.find(".column-label");  
+				console.log("column break target (col.wrapper)", $target);
 
-            let $target = null;
-            let contextClass = "";
-            
-            // Querying the DOM via wrapped form wrapper if field object isn't completely drawn yet
-            let $wrapper = field.$wrapper || $form_wrapper.find(`[data-fieldname="${fieldname}"]`);
-            if (!$wrapper || !$wrapper.length) return;
+				if (!$target || !$target.length) return;
 
-            if (field.df && field.df.fieldtype === "Section Break") {
-                $target = $wrapper.find(".section-head");
+				const $existing = $target.find(".custom-form-icon-svg");
+				if ($existing.length) {
+					$existing.data("svg-entry", entry);
+					$existing.html(pick_svg(entry, theme));
+					return;
+				}
+				const $icon = $(`<span class="custom-form-icon-svg column-icon-svg" aria-hidden="true"></span>`);
+				$icon.data("svg-entry", entry);
+				$icon.html(pick_svg(entry, theme));
+				$target.prepend($icon);
+				return;
+			}
+
+			// section logic — untouched below this line
+			const field = frm.fields_dict[fieldname];
+			if (!field) return;
+
+			let $target = null;
+			let contextClass = "";
+
+			let $wrapper = field.$wrapper || $form_wrapper.find(`[data-fieldname="${fieldname}"]`);
+			if (!$wrapper || !$wrapper.length) return;
+
+			if (field.df && field.df.fieldtype === "Section Break") {
+				$target = $wrapper.find(".section-head");
 				console.log("section break target", $target);
-                if (!$target.length) $target = $wrapper.find(".form-section-heading");
-                contextClass = "section-icon-svg";
-            } 
-            else if (field.df && field.df.fieldtype === "Column Break") {
-                $target = $wrapper.find(".column-label");
-				console.log("column break target", $target);
-                contextClass = "column-icon-svg";
-            } 
-            else {
-                if (field.label_area) {
-                    $target = $(field.label_area);
+				if (!$target.length) $target = $wrapper.find(".form-section-heading");
+				contextClass = "section-icon-svg";
+			} else {
+				if (field.label_area) {
+					$target = $(field.label_area);
 					console.log("field label area target", $target);
-                } else if (field.$label) {
-                    $target = field.$label;
-                } else {
-                    $target = $wrapper.find(".control-label");
-                }
-                contextClass = "field-icon-svg";
-            }
+				} else if (field.$label) {
+					$target = field.$label;
+				} else {
+					$target = $wrapper.find(".control-label");
+				}
+				contextClass = "field-icon-svg";
+			}
 
-            if (!$target || !$target.length) return;
+			if (!$target || !$target.length) return;
 
-            const $existing = $target.find(".custom-form-icon-svg");
-            if ($existing.length) {
-                $existing.data("svg-entry", entry);
-                $existing.html(pick_svg(entry, theme));
-                return;
-            }
+			const $existing = $target.find(".custom-form-icon-svg");
+			if ($existing.length) {
+				$existing.data("svg-entry", entry);
+				$existing.html(pick_svg(entry, theme));
+				return;
+			}
 
-            const $icon = $(
-                `<span class="custom-form-icon-svg ${contextClass}" aria-hidden="true"></span>`
-            );
-            $icon.data("svg-entry", entry);
-            $icon.html(pick_svg(entry, theme));
-            
-            $target.prepend($icon);
-        });
-    }
-
+			const $icon = $(`<span class="custom-form-icon-svg ${contextClass}" aria-hidden="true"></span>`);
+			$icon.data("svg-entry", entry);
+			$icon.html(pick_svg(entry, theme));
+			$target.prepend($icon);
+		});
+	}
     function refresh(frm) {
         if (!frm || !frm.doctype) return;
         bind_realtime();
@@ -278,11 +301,10 @@
             } else {
                 setTimeout(function() {
                     render(frm, icons);
-                }, 150);
+                }, 100);
             }
         });
     }
-
     $(document).on("form-refresh", function (e, frm) {
         refresh(frm);
     });

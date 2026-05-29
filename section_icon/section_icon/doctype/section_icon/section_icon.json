@@ -7,6 +7,7 @@
  "engine": "InnoDB",
  "field_order": [
   "for_doctype",
+  "field_type",
   "fieldname",
   "use_same_icon_in_dark_mode",
   "icons_section",
@@ -27,11 +28,11 @@
    "reqd": 1
   },
   {
-   "description": "Select a Section Break from the target DocType. Choose DocType first.",
+   "depends_on": "eval:doc.field_type",
    "fieldname": "fieldname",
    "fieldtype": "Autocomplete",
    "in_list_view": 1,
-   "label": "Section Break",
+   "label": "Field Name",
    "reqd": 1
   },
   {
@@ -78,10 +79,17 @@
    "fieldtype": "Code",
    "label": "Dark SVG Markup",
    "options": "HTML"
+  },
+  {
+   "fieldname": "field_type",
+   "fieldtype": "Select",
+   "label": "Field Type",
+   "options": "\nField\nSection Break\nColumn Break",
+   "reqd": 1
   }
  ],
  "links": [],
- "modified": "2026-05-24 10:00:08.856765",
+ "modified": "2026-05-29 22:51:14.915071",
  "modified_by": "Administrator",
  "module": "Section Icon",
  "name": "Section Icon",
