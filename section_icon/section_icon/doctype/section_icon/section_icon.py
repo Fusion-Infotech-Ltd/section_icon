@@ -5,6 +5,12 @@ import re
 import frappe
 from frappe.model.document import Document
 
+from section_icon.api import (
+	CACHE_KEY_BUNDLE,
+	CACHE_KEY_VERSION,
+	_doctype_cache_key,
+)
+
 
 class SectionIcon(Document):
 	def validate(self):
@@ -85,12 +91,22 @@ class SectionIcon(Document):
 		else:
 			self.svg_markup = content[match.start():].strip()
 
+	def _invalidate_caches(self):
+		"""Drop server-side caches so the next read repopulates and clients refetch."""
+		cache = frappe.cache()
+		if self.for_doctype:
+			cache.delete_value(_doctype_cache_key(self.for_doctype))
+		cache.delete_value(CACHE_KEY_BUNDLE)
+		cache.delete_value(CACHE_KEY_VERSION)
+
 	def on_update(self):
+		self._invalidate_caches()
 		frappe.publish_realtime(
 			"section_icon_updated", {"for_doctype": self.for_doctype}, after_commit=True
 		)
 
 	def on_trash(self):
+		self._invalidate_caches()
 		frappe.publish_realtime(
 			"section_icon_updated", {"for_doctype": self.for_doctype}, after_commit=True
 		)
