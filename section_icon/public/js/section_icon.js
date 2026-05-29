@@ -230,7 +230,6 @@
 			if (column_dom_map.hasOwnProperty(fieldname)) {             
 				const $col_wrapper = column_dom_map[fieldname];        
 				const $target = $col_wrapper.find(".column-label");  
-				console.log("column break target (col.wrapper)", $target);
 
 				if (!$target || !$target.length) return;
 
@@ -259,13 +258,11 @@
 
 			if (field.df && field.df.fieldtype === "Section Break") {
 				$target = $wrapper.find(".section-head");
-				console.log("section break target", $target);
 				if (!$target.length) $target = $wrapper.find(".form-section-heading");
 				contextClass = "section-icon-svg";
 			} else {
 				if (field.label_area) {
 					$target = $(field.label_area);
-					console.log("field label area target", $target);
 				} else if (field.$label) {
 					$target = field.$label;
 				} else {
