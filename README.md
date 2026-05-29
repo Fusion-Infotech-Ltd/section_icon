@@ -1,16 +1,18 @@
 # Section Icon
 
-A Frappe app that adds SVG icons to Section Break fields in your forms
+A Frappe app that adds SVG icons to Input Field Label, Section Break, and Column Break fields in your forms
 
 Icons are stored in a dedicated **Section Icon** doctype and rendered inline next to section titles at runtime via a lightweight client script.
 
 # Images
 
 **Light Theme**
-<img width="480" height="270" alt="image" src="https://github.com/user-attachments/assets/003a8a98-bd59-44ea-97ba-460ed8bf9b7b" />
+<img width="1278" height="637" alt="Screenshot 2026-05-30 025052" src="https://github.com/user-attachments/assets/392df3ef-7be8-4cec-a03a-540239646069" />
+
 
 **Dark Theme**
-<img width="480" height="270" alt="image" src="https://github.com/user-attachments/assets/092af0c3-24aa-4556-8230-ef83fe716404" />
+<img width="1222" height="635" alt="Screenshot 2026-05-30 025024" src="https://github.com/user-attachments/assets/b489a164-2d7b-4245-952f-7ec834f2f45c" />
+
 
 ---
 
@@ -20,6 +22,7 @@ Icons are stored in a dedicated **Section Icon** doctype and rendered inline nex
 2. Uncheck Use same icon in dark mode to upload separate icon for dark and light theme. (optional)
 3. A bundled JS script listens for `form-refresh` events, fetches the icons for the current DocType (cached per session), and prepends each SVG inline next to the matching section title.
 4. Cache is invalidated automatically via a Frappe realtime event whenever an icon is saved or deleted.
+5. Change your svg icon color to either black #000000 or white #ffffff so that icon color changes automatically with the theme
 
 No Custom Fields are added to any DocType. No monkey-patching of core forms.
 
