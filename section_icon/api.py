@@ -39,5 +39,5 @@ def get_section_breaks_for(doctype: str) -> list[dict]:
 			"label": (df.label or df.fieldname).strip(),
 		}
 		for df in meta.fields
-		if df.fieldtype == "Section Break" and df.fieldname
+		if df.fieldname
 	]
