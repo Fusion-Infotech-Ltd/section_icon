@@ -10,3 +10,7 @@ app_license = "MIT"
 app_include_js = ["/assets/section_icon/js/section_icon.js"]
 app_include_css = ["/assets/section_icon/css/section_icon.css"]
 
+# Boot session
+# ------------
+boot_session = "section_icon.boot.boot_session"
+

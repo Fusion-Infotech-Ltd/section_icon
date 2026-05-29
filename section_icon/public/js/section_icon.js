@@ -5,6 +5,64 @@
     const pending = {};
     let realtime_bound = false;
     let theme_observer_bound = false;
+    let boot_hydrated = false;
+
+    const STORAGE_PREFIX = "section_icon:v1:";
+    const STORAGE_TTL_MS = 7 * 24 * 60 * 60 * 1000;
+
+    function get_boot_version() {
+        return (window.frappe && frappe.boot && frappe.boot.section_icon_version) || "";
+    }
+
+    function hydrate_from_boot() {
+        if (boot_hydrated) return;
+        boot_hydrated = true;
+        const preload = window.frappe && frappe.boot && frappe.boot.section_icons;
+        if (!preload || typeof preload !== "object") return;
+        Object.keys(preload).forEach(function (doctype) {
+            if (!cache[doctype]) cache[doctype] = preload[doctype] || {};
+        });
+    }
+
+    function read_local(doctype) {
+        try {
+            const raw = localStorage.getItem(STORAGE_PREFIX + doctype);
+            if (!raw) return null;
+            const parsed = JSON.parse(raw);
+            if (!parsed || parsed.version !== get_boot_version()) return null;
+            if (!parsed.ts || Date.now() - parsed.ts > STORAGE_TTL_MS) return null;
+            return parsed.icons || null;
+        } catch (e) {
+            return null;
+        }
+    }
+
+    function write_local(doctype, icons) {
+        try {
+            localStorage.setItem(STORAGE_PREFIX + doctype, JSON.stringify({
+                icons: icons,
+                version: get_boot_version(),
+                ts: Date.now(),
+            }));
+        } catch (e) {
+            // quota or unavailable — silently skip
+        }
+    }
+
+    function clear_local(doctype) {
+        try {
+            if (doctype) {
+                localStorage.removeItem(STORAGE_PREFIX + doctype);
+                return;
+            }
+            for (let i = localStorage.length - 1; i >= 0; i--) {
+                const key = localStorage.key(i);
+                if (key && key.indexOf(STORAGE_PREFIX) === 0) localStorage.removeItem(key);
+            }
+        } catch (e) {
+            // ignore
+        }
+    }
 
     const NAMED_COLORS = {
         black: [0, 0, 0], white: [255, 255, 255], gray: [128, 128, 128],
@@ -174,14 +232,27 @@
         if (realtime_bound) return;
         if (!window.frappe || !frappe.realtime || !frappe.realtime.on) return;
         frappe.realtime.on("section_icon_updated", function (data) {
-            if (data && data.for_doctype) delete cache[data.for_doctype];
+            if (data && data.for_doctype) {
+                delete cache[data.for_doctype];
+                clear_local(data.for_doctype);
+            } else {
+                Object.keys(cache).forEach(function (k) { delete cache[k]; });
+                clear_local(null);
+            }
         });
         realtime_bound = true;
     }
 
     function fetch_icons(doctype) {
+        hydrate_from_boot();
         if (cache[doctype]) return Promise.resolve(cache[doctype]);
         if (pending[doctype]) return pending[doctype];
+
+        const stored = read_local(doctype);
+        if (stored) {
+            cache[doctype] = stored;
+            return Promise.resolve(stored);
+        }
 
         pending[doctype] = frappe
             .xcall("section_icon.api.get_icons_for", { doctype: doctype })
@@ -194,6 +265,7 @@
                     };
                 });
                 cache[doctype] = map;
+                write_local(doctype, map);
                 delete pending[doctype];
                 return map;
             })
@@ -290,16 +362,20 @@
         if (!frm || !frm.doctype) return;
         bind_realtime();
         bind_theme_observer();
-        
+
         fetch_icons(frm.doctype).then(function (icons) {
-            // Robust engine-agnostic check: Ensure sections layout array exists before execution
-            if (frm.layout && frm.layout.sections) {
-                render(frm, icons);
-            } else {
-                setTimeout(function() {
+            // A synchronous cache hit (L1/L2/L4) resolves inside the same microtask as
+            // the form-refresh handler, before Frappe finishes attaching column-label /
+            // control-label / label_area DOM. Defer to the next macrotask so those nodes
+            // exist by the time render() looks for them.
+            const run = function () {
+                if (frm.layout && frm.layout.sections) {
                     render(frm, icons);
-                }, 100);
-            }
+                } else {
+                    setTimeout(function () { render(frm, icons); }, 100);
+                }
+            };
+            setTimeout(run, 0);
         });
     }
     $(document).on("form-refresh", function (e, frm) {
