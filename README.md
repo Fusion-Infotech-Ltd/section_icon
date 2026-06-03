@@ -1,6 +1,6 @@
 # Section Icon
 
-A Frappe app that adds SVG icons to Input Field Label, Section Break, and Column Break fields in your forms
+A Frappe (v15 and v16) app that adds SVG icons to Input Field Label, Section Break, and Column Break fields in your forms
 
 Icons are stored in a dedicated **Section Icon** doctype and rendered inline next to section titles at runtime via a lightweight client script.
 
