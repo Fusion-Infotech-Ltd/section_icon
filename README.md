@@ -4,7 +4,8 @@ A Frappe (v15 and v16) app that adds SVG icons to Input Field Label, Section Bre
 
 Icons are stored in a dedicated **Section Icon** doctype and rendered inline next to section titles at runtime via a lightweight client script.
 
-# Video Tutorial: https://youtu.be/QE6V6z_IS-I
+# Video Tutorial: ▶️ [Watch the tutorial on YouTube](https://youtu.be/QE6V6z_IS-I)
+
 
 # Images
 
